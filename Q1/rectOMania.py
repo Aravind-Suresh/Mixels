@@ -24,12 +24,10 @@ def process(pts):
 
 	return midPt, np.uint8(np.degrees(np.arctan((pt2[1]-pt1[1])/(pt2[0]-pt1[0]))))
 
-
 img = cv2.imread(sys.argv[1])
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 rows, cols = gray.shape
-
 gray = cv2.GaussianBlur(gray, (5, 5), 0)
 
 ret, thresh = cv2.threshold(gray,127,255,1)
