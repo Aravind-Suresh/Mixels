@@ -17,18 +17,38 @@ gray = cv2.GaussianBlur(gray, (5, 5), 0)
 gray = cv2.equalizeHist(gray)
 
 edge = cv2.Canny(gray, 40, 40)
-cv2.imshow("edge", edge)
+ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
-circles = cv2.HoughCircles(edge, cv2.HOUGH_GRADIENT, 1.4, 50, minRadius = 10, maxRadius = 500)
+totalArea = cols*rows
 
-if circles is not None:
-	circles = np.uint8(circles[0, :])
+if np.mean(thresh) > 127:
+	thresh = 255 - thresh
 
-	for (x, y, r) in circles:
-		cv2.circle(img, (x, y), r, (0, 255, 0), 4)
-		cv2.rectangle(img, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+dt = cv2.distanceTransform(thresh, cv2.DIST_L2, 5)
+ret, sure_fg = cv2.threshold(dt,0.1*dt.max(),255,0)
+dt = np.uint8(dt)
+sure_fg = np.uint8(sure_fg)
 
-	cv2.imshow("output", img)
-	cv2.waitKey(0)
+# cv2.imshow("thresh", thresh)
+# cv2.imshow("fg", sure_fg)
+# cv2.imshow("dt", dt)
 
-cv2.destroyAllWindows()
+_, contours, h = cv2.findContours(sure_fg, cv2.RETR_EXTERNAL, 2)
+
+count = 0
+
+for cnt in contours:
+	area = cv2.contourArea(cnt)
+	(x,y), radius = cv2.minEnclosingCircle(cnt)
+	areaC = np.pi*radius*radius
+	dev = np.abs(area - areaC)/areaC
+	if dev > 0.3:
+		continue
+	count += 1
+	# print area, areaC
+	color = np.random.randint(0, 255, 3)
+	cv2.drawContours(img, [cnt], 0, color, -1)
+
+print count
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
