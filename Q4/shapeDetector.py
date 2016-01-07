@@ -34,6 +34,6 @@ for idx in range(0, len(count)):
 		continue
 	print str(idx) + " - " + str(count[idx])
 
-cv2.imshow('img', img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow('img', img)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
