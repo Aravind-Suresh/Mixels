@@ -1,20 +1,31 @@
-import cv2, math, numpy as np
+# Necessary modules imported
+import numpy as np
+import sys
+import cv2
+
+# Ensuring correct arguments
+if not len(sys.argv) == 3:
+	print "Usage : %s <input image> <output image>" % sys.argv[0]
+	sys.exit()
 
 class justaclass(object):
 	pass
 
 def getArea(item):
 	return item.area
+
 def distance(p0, p1):
 	return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
 
-img = cv2.imread('page0.jpg',0)
-cv2.imshow("input", img)
+img = cv2.imread(sys.argv[1], 0)
 arr = []
+
 ret, otsu = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 img1 = cv2.bitwise_and(img, otsu)
-cv2.imshow("otsu", otsu)
 img2 = img1
+
+# OpenCV 3.0.0				: _, contours, h
+# OpenCV 2.4.11 and before	: contours, h
 _, contours,hierarchy = cv2.findContours(otsu, 1, 2)
 
 for cnt in contours:
@@ -23,7 +34,7 @@ for cnt in contours:
 	obj.rect = cv2.minAreaRect(cnt)
 	obj.contour = cnt
 	box = cv2.boxPoints(obj.rect)
-	obj.box = np.int0(box)	
+	obj.box = np.int0(box)
 	arr.append(obj)
 
 sorted(arr, key=getArea)
@@ -38,7 +49,7 @@ while(1):
 	if approx.size == 8:
 		break
 	else:
-		epsilon = epsilon*2		
+		epsilon = epsilon*2
 
 bdry = np.array([[approx[2][0][0], approx[2][0][1]], [approx[1][0][0], approx[1][0][1]], [approx[0][0][0], approx[0][0][1]], [approx[3][0][0], approx[3][0][1]]], dtype="int0")
 # print bdry
@@ -58,5 +69,4 @@ pts2 = np.float32([[0,dimx-1],[0,0],[dimy-1,0],[dimy-1,dimx-1]])
 M = cv2.getPerspectiveTransform(pts1,pts2)
 img3 = cv2.warpPerspective(img1, M, (int(dimy),int(dimx)))
 
-cv2.imshow("output", img3)
-cv2.imshow("intermediate",img2);cv2.waitKey(0)
+cv2.imwrite(sys.argv[2], img3)
