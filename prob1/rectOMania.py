@@ -22,7 +22,7 @@ def process(pts):
 	pt1 = np.float32(pts[idx])
 	pt2 = np.float32(ptsS[idx])
 
-	return midPt, np.degrees(np.arctan((pt2[1]-pt1[1])/(pt2[0]-pt1[0])))
+	return midPt, np.uint8(np.degrees(np.arctan((pt2[1]-pt1[1])/(pt2[0]-pt1[0]))))
 
 
 img = cv2.imread(sys.argv[1])
